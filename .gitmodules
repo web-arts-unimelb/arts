@@ -1,0 +1,3 @@
+[submodule "modules/qless"]
+	path = modules/qless
+	url = git@github.com:web-arts-unimelb/qless.git
