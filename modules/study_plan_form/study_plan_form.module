@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * This module handles study plan form
+ *
+ */
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function study_plan_form_form_alter(&$form, &$form_state, $form_id) 
+{
+	$study_plan_form_id = "webform_client_form_506";
+
+  switch($form_id) 
+  {
+		case "$study_plan_form_id":
+			$form['calculate_button'] = array(
+  			'#type' => 'submit',
+  			'#value' => t('Calculate'),
+			);
+			$form['#validate'][] = '_study_plan_form_validate';
+			
+		  break;
+  }
+}
+
+
+function study_plan_form_tokens_alter(array &$replacements, array $context) {
+  if ($context['type'] == 'submission' && !empty($context['data']['webform-submission'])) {
+    $submission_obj = $context['data']['webform-submission'];
+    //$node = $context['data']['node'] ? $context['data']['node'] : node_load($submission->nid);
+		$submission_data = $submission_obj->data;
+		
+		$total_points = 0;
+		$component_num = 3;
+		foreach($submission_data as $key => $value)
+		{
+			$item = $value[0];
+			// e.g. MULT1--Arts Foundation Subject--12.5
+			$array = explode("--", $item);
+			
+			if(count($array) == $component_num)
+			{
+				$point = $array[2];
+				$total_points = $total_points + (float)$point;
+			}
+		}
+
+    // Find any token starting with submission:values.
+    if ($value_tokens = token_find_with_prefix($context['tokens'], 'values')) {
+      if (!empty($value_tokens['total_points'])) {
+        $replacements[$value_tokens['total_points']] = $total_points;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_webform_submission_insert
+ */
+ /*
+function study_plan_form_webform_submission_insert($node, $submission) 
+{
+	$array = token_replace('[foa:study_plan_total_points]', array("webform-submission" => $submission));
+}
+*/
+
+
+/**
+ * Additional validation handler for the Get Started form.
+ */
+function _study_plan_form_validate($form, &$form_state) 
+{
+  if($form_state['clicked_button']['#value'] == 'Calculate') 
+  {
+    $submitted_array = $form_state['values']['submitted'];
+    
+    if(count($submitted_array) > 0)
+    {
+    	
+    	$total_points = 0;
+    	foreach($submitted_array as $item)
+    	{
+    		//
+    		$array = explode("--", $item);
+    		$point = (float)$array[2];
+    		$total_points = $total_points + $point;
+    	}
+    	
+    }
+    
+  	$message = "total: $total_points";
+    drupal_set_message($message);
+  }
+}
+
+
+/**
+ * Implements hook_token_info().
+ */
+/* 
+function study_plan_form_token_info() 
+{
+    $info['tokens']['foa']['study_plan_total_points'] = array(
+        'name' => t('Study plan total points'),
+        'description' => t('Study plan total points'),
+    );
+    return $info;
+}
+*/
+
+/**
+ * Implements hook_token().
+ */
+/* 
+function study_plan_form_tokens($type, $tokens, array $data = array(), array $options = array()) 
+{
+	$replacements = array();
+	
+	if($type == 'foa' && !empty($data['webform-submission'])) 
+	{
+		$submission = $data['webform-submission'];
+	
+		foreach($tokens as $name => $original) 
+		{
+			switch($name) 
+			{
+				case 'study_plan_total_points':
+		        $replacements[$original] = 44;
+		        break;
+		  }      
+		}
+	}
+
+	return $replacements;
+}
+*/
