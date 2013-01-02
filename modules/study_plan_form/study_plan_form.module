@@ -15,10 +15,13 @@ function study_plan_form_form_alter(&$form, &$form_state, $form_id)
   switch($form_id) 
   {
 		case "$study_plan_form_id":
-			$form['calculate_button'] = array(
+			$form['actions']['calculate_button'] = array(
   			'#type' => 'submit',
-  			'#value' => t('Calculate your study plan'),
+  			'#value' => t('Calculate study plan'),
 			);
+
+			$form['actions']['submit']['#value'] = 'Submit to Arts student centre';
+
 			$form['#validate'][] = '_study_plan_form_validate';
 			
 		  break;
@@ -118,7 +121,7 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
  */
 function _study_plan_form_validate($form, &$form_state) 
 {
-  if($form_state['clicked_button']['#value'] == 'Calculate your study plan') 
+  if($form_state['clicked_button']['#value'] == 'Calculate study plan') 
   {
     $submitted_array = $form_state['values']['submitted'];
     
