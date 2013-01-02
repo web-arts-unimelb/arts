@@ -17,7 +17,7 @@ function study_plan_form_form_alter(&$form, &$form_state, $form_id)
 		case "$study_plan_form_id":
 			$form['calculate_button'] = array(
   			'#type' => 'submit',
-  			'#value' => t('Calculate'),
+  			'#value' => t('Calculate your study plan'),
 			);
 			$form['#validate'][] = '_study_plan_form_validate';
 			
@@ -31,40 +31,86 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
     $submission_obj = $context['data']['webform-submission'];
     //$node = $context['data']['node'] ? $context['data']['node'] : node_load($submission->nid);
 		$submission_data = $submission_obj->data;
-		
-		$total_points = 0;
-		$component_num = 3;
-		foreach($submission_data as $key => $value)
-		{
-			$item = $value[0];
-			// e.g. MULT1--Arts Foundation Subject--12.5
-			$array = explode("--", $item);
+		$new_submission_data = _translate_submission_data_key($submission_data);
+	
+		// Level 1 arts studies	
+		$form_key_array = array(
+			"arts_foundation_subject",
+			"arts_foundation_discipline",
+			"discipline_1",
+			"discipline_2",
+			"discipline_3",
+			"discipline_4"
+		);
+		$level_1_arts_studies_points = _calculate_subject_points($new_submission_data, $form_key_array);
+	
+		// First major
+		$form_key_array = array(
+			"major_1_level_1_subject_1",
+			"major_1_level_1_subject_2",
+			"major_1_level_1_subject_3",
 			
-			if(count($array) == $component_num)
-			{
-				$point = $array[2];
-				$total_points = $total_points + (float)$point;
-			}
-		}
+			"major_1_level_2_subject_1",
+			"major_1_level_2_subject_2",
+			"major_1_level_2_subject_3",
+			
+			"major_1_level_3_subject_1",
+			"major_1_level_3_subject_2",
+			"major_1_level_3_subject_3"
+		);
+		$first_major_points = _calculate_subject_points($new_submission_data, $form_key_array);
+	
+		// Second major
+		$form_key_array = array(
+			"major_2_level_1_subject_1",
+			"major_2_level_1_subject_2",
+			
+			"major_2_level_2_subject_1",
+			"major_2_level_2_subject_2",
+			"major_2_level_2_subject_3",
+			
+			"major_2_level_3_subject_1",
+			"major_2_level_3_subject_2",
+			"major_2_level_3_subject_3"
+		);
+		$second_major_points = _calculate_subject_points($new_submission_data, $form_key_array);
+	
+		// Breadth
+		$form_key_array = array(
+			"breadth_subject_1",
+			"breadth_subject_2",
+			"breadth_subject_3",
+			"breadth_subject_4",
+			"breadth_subject_5",
+			"breadth_subject_6"
+		);
+		$breadth_points = _calculate_subject_points($new_submission_data, $form_key_array);
+
+		// Half
+		$form_key_array = array(
+			"half_subject_1",
+			"half_subject_2",
+			"half_subject_3",
+			"half_subject_4",
+			"half_subject_5",
+			"half_subject_6"
+		);
+		$half_subject_points = _calculate_subject_points($new_submission_data, $form_key_array);
+
+		//test
+		// print_r($breadth_points);
+		// die;
 
     // Find any token starting with submission:values.
     if ($value_tokens = token_find_with_prefix($context['tokens'], 'values')) {
       if (!empty($value_tokens['total_points'])) {
         $replacements[$value_tokens['total_points']] = $total_points;
       }
+      
+      
     }
   }
 }
-
-/**
- * Implementation of hook_webform_submission_insert
- */
- /*
-function study_plan_form_webform_submission_insert($node, $submission) 
-{
-	$array = token_replace('[foa:study_plan_total_points]', array("webform-submission" => $submission));
-}
-*/
 
 
 /**
@@ -72,7 +118,7 @@ function study_plan_form_webform_submission_insert($node, $submission)
  */
 function _study_plan_form_validate($form, &$form_state) 
 {
-  if($form_state['clicked_button']['#value'] == 'Calculate') 
+  if($form_state['clicked_button']['#value'] == 'Calculate your study plan') 
   {
     $submitted_array = $form_state['values']['submitted'];
     
@@ -96,43 +142,62 @@ function _study_plan_form_validate($form, &$form_state)
 }
 
 
-/**
- * Implements hook_token_info().
- */
-/* 
-function study_plan_form_token_info() 
+function _translate_submission_data_key($submission_data)
 {
-    $info['tokens']['foa']['study_plan_total_points'] = array(
-        'name' => t('Study plan total points'),
-        'description' => t('Study plan total points'),
-    );
-    return $info;
-}
-*/
-
-/**
- * Implements hook_token().
- */
-/* 
-function study_plan_form_tokens($type, $tokens, array $data = array(), array $options = array()) 
-{
-	$replacements = array();
-	
-	if($type == 'foa' && !empty($data['webform-submission'])) 
+	$array = array();
+	foreach($submission_data as $key => $value)
 	{
-		$submission = $data['webform-submission'];
-	
-		foreach($tokens as $name => $original) 
-		{
-			switch($name) 
-			{
-				case 'study_plan_total_points':
-		        $replacements[$original] = 44;
-		        break;
-		  }      
-		}
+		$new_key = _translate_numeric_key_to_field_key($key);
+		$array[$new_key] = $value[0];
 	}
 
-	return $replacements;
+	return $array;
 }
-*/
+
+
+function _translate_numeric_key_to_field_key($key)
+{
+	$result = db_select('webform_component', 'com')
+    ->fields('com', array("form_key"))
+    ->condition('cid', $key, '=')
+    ->range(0, 1)
+    ->execute()
+    ->fetchField();
+	
+	return $result;
+}
+
+
+function _calculate_subject_points($data, $form_key_array)
+{
+	$total_points = 0;
+	
+	foreach($form_key_array as $form_key)
+	{
+		$tmp_point = _get_single_subject_point($data[$form_key]);
+		$total_points = $total_points + $tmp_point;	
+	}
+	
+	return $total_points;
+}
+
+
+function _get_single_subject_point($item)
+{
+	$component_num = 3;
+	
+	// e.g. $item == MULT1--Arts Foundation Subject--12.5
+	$array = explode("--", $item);
+	
+	if(count($array) == $component_num)
+	{
+		$point = $array[2];
+	}
+	else
+	{
+		$point = 0;
+	}
+	
+	return (float)$point;
+}
+
