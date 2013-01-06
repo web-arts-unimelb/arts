@@ -147,7 +147,8 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 	  		$replacements[$index] = $first_major_points;
 	  		 
 	  		$index = "[submission:values:total_points:nolabel]";
-	  		$replacements[$index] = $total_points; 
+	  		$replacements[$index] = $total_points;
+	  		 
 	  	}
 		  
     }
