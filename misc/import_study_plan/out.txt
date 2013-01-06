@@ -1,0 +1,56 @@
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 1048 Column &#039;nid&#039; cannot be null: INSERT INTO {webform_component} (nid, cid, pid, form_key, name, type, value, extra, mandatory, weight) VALUES (:db_insert_placeholder_0, :db_insert_placeholder_1, :db_insert_placeholder_2, :db_insert_placeholder_3, :db_insert_placeholder_4, :db_insert_placeholder_5, :db_insert_placeholder_6, :db_insert_placeholder_7, :db_insert_placeholder_8, :db_insert_placeholder_9); Array
+(
+    [:db_insert_placeholder_0] => 
+    [:db_insert_placeholder_1] => 1
+    [:db_insert_placeholder_2] => 
+    [:db_insert_placeholder_3] => 
+    [:db_insert_placeholder_4] => 
+    [:db_insert_placeholder_5] => 
+    [:db_insert_placeholder_6] => 
+    [:db_insert_placeholder_7] => a:2:{s:5:"items";s:1302:"AHIS1--Art History--12.5
+ANCW1--Ancient World Studies--12.5
+ANTH1--Anthropology--12.5
+ARBC1--Arabic--12.5
+ASIA1--Asian Studies--12.5
+ASIA1--Chinese Studies--12.5
+AUST1--Australian Studies (Discontinued)--12.5
+CHIN1--Chinese --12.5
+CLAS1--Ancient Greek --12.5
+CLAS1--Latin   (Intensive 25 points)--25
+CLAS1--Latin --12.5
+CRIM1--Criminology--12.5
+CULS1--Screen and Cultural Studies--12.5
+CWRI1--Creative Writing--12.5
+DEVT1--Development Studies--12.5
+ECON1--Economics  Major--12.5
+ENGL1--English--12.5
+EURO1--European Studies--12.5
+FREN1--French --12.5
+GEND1--Gender Studies--12.5
+GEOG1--Geography--12.5
+GERM1--German --12.5
+HEBR1--Hebrew and Jewish Studies--12.5
+HIST1--History--12.5
+HPSC1--History & Philosophy of Science--12.5
+INDO1--Indonesian --12.5
+INTS1--Politics & International Studies--12.5
+ISLM1--Islamic Studies--12.5
+ITAL1--Italian --12.5
+JAPN1--Japanese --12.5
+JEWI1--Hebrew and Jewish Studies--12.5
+LING1--English Language Studies--12.5
+LING1--Linguistics and Applied Linguistics--12.5
+MECM1--Media and Communications--12.5
+PHIL1--Philosophy--12.5
+POLS1--Politics & International Studies--12.5
+PSYC1--Psychology--12.5
+RUSS1--Russian--12.5
+SCRN1--Screen and Cultural Studies--12.5
+SOCI1--Sociology--12.5
+SOLS1--Law and Justice--12.5
+SPAN1--Spanish --12.5
+SWED1--Swedish (Discontinued)--12.5";s:7:"private";i:0;}
+    [:db_insert_placeholder_8] => 0
+    [:db_insert_placeholder_9] => 
+)
+ in webform_component_insert() (line 777 of /var/aegir/platforms/staging/drupal-7.18/sites/all/modules/contrib/webform/includes/webform.components.inc).
