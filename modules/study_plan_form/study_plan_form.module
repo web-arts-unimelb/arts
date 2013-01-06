@@ -36,6 +36,9 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 		$submission_data = $submission_obj->data;
 		$new_submission_data = _translate_submission_data_key($submission_data);
 	
+		// Total points
+		$total_points = 0;
+	
 		// Level 1 arts studies	
 		$form_key_array = array(
 			"arts_foundation_subject",
@@ -78,7 +81,7 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 		);
 		$second_major_points = _calculate_subject_points($new_submission_data, $form_key_array);
 	
-		// Breadth
+		// Breadth subject
 		$form_key_array = array(
 			"breadth_subject_1",
 			"breadth_subject_2",
@@ -89,7 +92,7 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 		);
 		$breadth_points = _calculate_subject_points($new_submission_data, $form_key_array);
 
-		// Half
+		// Half subject
 		$form_key_array = array(
 			"half_subject_1",
 			"half_subject_2",
@@ -100,17 +103,53 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 		);
 		$half_subject_points = _calculate_subject_points($new_submission_data, $form_key_array);
 
-		//test
-		// print_r($breadth_points);
-		// die;
+		// Total points
+		$total_points = 
+			$level_1_arts_studies_points +
+			$first_major_points + 
+			$second_major_points +
+			$breadth_points + 
+			$half_subject_points;
 
+		/*
     // Find any token starting with submission:values.
-    if ($value_tokens = token_find_with_prefix($context['tokens'], 'values')) {
-      if (!empty($value_tokens['total_points'])) {
+    if($value_tokens = token_find_with_prefix($context['tokens'], 'values')) 
+    {
+      if(!empty($value_tokens['total_points'])) 
+      {      		
         $replacements[$value_tokens['total_points']] = $total_points;
       }
       
-      
+      die("die here");
+    }
+    */
+    
+    if(isset($context['data']['node']))
+    {
+    	$node = $context['data']['node'];
+    
+    	//test
+    	/*
+		  echo "<pre>";
+			print_r($replacements);
+		
+			echo "<br/>=========<br/>";
+		
+			print_r($node);
+		  echo "</pre>";
+		  die;
+		  */
+    
+	  	// Complete a study plan check form
+	  	if($node->nid == 506)
+	  	{
+	  		$index = "[submission:values:first_major_total_points:nolabel]";
+	  		$replacements[$index] = $first_major_points;
+	  		 
+	  		$index = "[submission:values:total_points:nolabel]";
+	  		$replacements[$index] = $total_points; 
+	  	}
+		  
     }
   }
 }
