@@ -88,12 +88,8 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 			"breadth_subject_3",
 			"breadth_subject_4",
 			"breadth_subject_5",
-			"breadth_subject_6"
-		);
-		$breadth_points = _calculate_subject_points($new_submission_data, $form_key_array);
-
-		// Half subject
-		$form_key_array = array(
+			"breadth_subject_6",
+			
 			"half_subject_1",
 			"half_subject_2",
 			"half_subject_3",
@@ -101,50 +97,36 @@ function study_plan_form_tokens_alter(array &$replacements, array $context) {
 			"half_subject_5",
 			"half_subject_6"
 		);
-		$half_subject_points = _calculate_subject_points($new_submission_data, $form_key_array);
+		$breadth_points = _calculate_subject_points($new_submission_data, $form_key_array);
 
 		// Total points
 		$total_points = 
 			$level_1_arts_studies_points +
 			$first_major_points + 
 			$second_major_points +
-			$breadth_points + 
-			$half_subject_points;
+			$breadth_points;
 
-		/*
-    // Find any token starting with submission:values.
-    if($value_tokens = token_find_with_prefix($context['tokens'], 'values')) 
-    {
-      if(!empty($value_tokens['total_points'])) 
-      {      		
-        $replacements[$value_tokens['total_points']] = $total_points;
-      }
-      
-      die("die here");
-    }
-    */
     
     if(isset($context['data']['node']))
     {
     	$node = $context['data']['node'];
     
-    	//test
-    	/*
-		  echo "<pre>";
-			print_r($replacements);
-		
-			echo "<br/>=========<br/>";
-		
-			print_r($node);
-		  echo "</pre>";
-		  die;
-		  */
-    
 	  	// Complete a study plan check form
 	  	if($node->nid == 506)
 	  	{
+	  	
+	  		// Points
+	  		$index = "[submission:values:level_1_arts_studies_points:nolabel]";
+	  		$replacements[$index] = $level_1_arts_studies_points;
+	  		
 	  		$index = "[submission:values:first_major_total_points:nolabel]";
 	  		$replacements[$index] = $first_major_points;
+	  		
+	  		$index = "[submission:values:second_major_total_points:nolabel]";
+	  		$replacements[$index] = $second_major_points;
+	  		 
+	  		$index = "[submission:values:breadth_total_points:nolabel]";
+	  		$replacements[$index] = $breadth_points;
 	  		 
 	  		$index = "[submission:values:total_points:nolabel]";
 	  		$replacements[$index] = $total_points;
