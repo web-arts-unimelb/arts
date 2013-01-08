@@ -161,7 +161,7 @@ function _study_plan_form_validate($form, &$form_state)
     	
     }
     
-  	$message = "total: $total_points";
+  	$message = "Total course points: $total_points";
     drupal_set_message($message);
   }
 }
