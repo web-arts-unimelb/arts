@@ -225,4 +225,3 @@ function _get_single_subject_point($item)
 	
 	return (float)$point;
 }
-
