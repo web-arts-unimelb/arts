@@ -1,0 +1,5 @@
+name = Award assistant 
+description = Assistant to content type award
+core = 7.x
+
+files[] = includes/views/handlers/award_handler_award_study_area.inc
