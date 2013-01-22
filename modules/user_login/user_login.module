@@ -1,0 +1,224 @@
+<?php
+
+/**
+* Implements hook_user_login
+*/
+function user_login_user_login(&$edit, $account) 
+{
+  if(!isset($_POST['form_id']) || $_POST['form_id'] != 'user_pass_reset' ) 
+  {
+    if(_is_login_via_ldap($account))
+    {
+    	if(_do_you_have_right_role($account))
+    	{
+    		// Continue
+    	}
+    	else
+    	{
+    		_assign_right_role($account);
+    	}
+    }
+    else
+    {
+    	// Login via internal drupal account
+    	// Continue
+    }
+    
+  }
+}
+
+function _is_login_via_ldap($account)
+{
+	$condi = false;
+
+	if( isset($account->data['ldap_authentication']['init']['dn']) )
+	{
+		if(	!empty($account->data['ldap_authentication']['init']['dn']) )
+		{
+			$condi = true;
+		}
+		else
+		{
+		
+		}
+	}
+	else
+	{
+	
+	}
+
+	return $condi;
+}
+
+// You should have a role as student or staff, 
+// but not both at the moment.
+function _do_you_have_right_role($account)
+{
+	$condi = false;
+
+	if( isset($account->data['roles']) )
+	{
+		if( is_array($account->data['roles']) )
+		{
+			foreach($account->data['roles'] as $role)
+			{
+				if(strtolower($role) == "student")
+				{
+					$condi = true;
+				}
+				elseif(strtolower($role) == "staff")
+				{
+					$condi = true;
+				}
+				else
+				{
+				
+				}
+			}
+		}
+		else
+		{
+		
+		}
+	}
+	else
+	{
+	
+	}
+
+	return $condi;
+}
+
+function _assign_right_role($account)
+{
+	$staff_role_name = "staff";
+	$student_role_name = "student";
+
+	$role_in_account = _get_role_in_account($account);
+	$uid = $account->uid;
+
+	if($role_in_account == $staff_role_name)
+	{
+		_assign_role($uid, $staff_role_name);
+	}
+	elseif($role_in_account == $student_role_name)
+	{
+		_assign_role($uid, $student_role_name);
+	}
+	else
+	{
+	
+	}
+}
+
+function _get_role_in_account($account)
+{
+	$return_role_name = "";
+
+	$staff_role_name = "staff";
+	$student_role_name = "student";
+
+	$staff_ad_1 = "ad";
+	$staff_ad_2 = "staff_ad1";
+	$student_ad_1 = "student_ad1";
+
+	if( isset($account->data['ldap_authentication']['init']['dn']) &&
+			isset($account->data['ldap_authentication']['init']['sid'])
+	)
+	{
+		if( !empty($account->data['ldap_authentication']['init']['dn']) && 
+				!empty($account->data['ldap_authentication']['init']['sid'])
+		) 
+		{
+			$ldap_server_name = $account->data['ldap_authentication']['init']['sid'];
+			if($ldap_server_name == $staff_ad_1 || $ldap_server_name == $staff_ad_2)
+			{
+				$return_role_name = $staff_role_name;
+			}
+			elseif($ldap_server_name == $student_ad_1)
+			{
+				$return_role_name = $student_role_name;
+			}
+			else
+			{
+			
+			}
+		}
+		else
+		{
+			
+		}
+	}
+	else
+	{
+	
+	}
+	
+	return $return_role_name;
+}
+
+function _get_role_id_by_name($name)
+{
+	$role_id = "";
+
+	$query = db_select('role', 'r');
+	$query->fields('r', array('rid'));
+	$query->condition('name', $name);
+	$query->orderBy('rid');
+	$query->range(0, 1);
+	
+	$result = $query->execute();
+	$record = $result->fetchAssoc();
+	$role_id = $record['rid'];
+
+	return $role_id;
+}
+
+function _assign_role($uid, $role_name)
+{
+	$role_id = _get_role_id_by_name($role_name);
+	
+	if( _is_users_roles_entry_existed($uid, $role_id) )
+	{
+		// Skip
+	}
+	else
+	{
+		_create_users_roles_entry($uid, $role_id);
+	}
+}
+
+function _is_users_roles_entry_existed($uid, $role_id)
+{
+	$query = db_select('users_roles', 'r');
+	$query->fields('r', array('uid'));
+	$query->condition('uid', $uid);
+	$query->condition('rid', $role_id);
+	$query->orderBy('uid');
+	$query->range(0, 1);
+	
+	$result = $query->execute();
+	$row_num = $result->rowCount();
+	if($row_num > 0)
+	{
+		$condi = true;
+	}
+	else
+	{
+		$condi = false;
+	}
+	
+	return $condi;
+}
+
+function _create_users_roles_entry($uid, $role_id)
+{
+	db_insert('users_roles')
+		->fields(
+				array(
+  				'uid' => $uid,
+  				'rid' => $role_id,
+				)
+		)
+	->execute();
+}
