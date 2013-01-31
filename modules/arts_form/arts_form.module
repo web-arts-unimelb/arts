@@ -33,7 +33,8 @@ function arts_form_menu() {
  * This function expects the form components to be in the 'forms' subdirectory
  * as form_name.html and form_name.inc.
  *
- * @see 
+ * @see http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_get_path/7
+ * @see http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_not_found/7
  */
 function arts_form_handler($form_name = '') {
   // Create filenames for the form html and handler.
