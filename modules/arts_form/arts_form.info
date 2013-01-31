@@ -1,0 +1,3 @@
+name = Arts Form
+description = Provides existing hard-coded FoA forms within Drupal.
+core = 7.x

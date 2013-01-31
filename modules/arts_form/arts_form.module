@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ *
+ * @see http://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_menu/7
+ *
+ * The % in the path is a wildcard, the array(1) in the arguments
+ * means that path array element #1 (the wildcard) is passed to
+ * the callback function.
+ */
+function arts_form_menu() {
+  $items['forms/%'] = array(
+    'title' => t('FoA Form'),
+    'description' => t('This is the menu item description.'),
+    'page callback' => 'arts_form_handler',
+    'page arguments' => array(1),
+    'access arguments' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Callback handler for arts_form.
+ *
+ * @param $form_name
+ *   The name of the form file to load.
+ *
+ * This function expects the form components to be in the 'forms' subdirectory
+ * as form_name.html and form_name.inc.
+ *
+ * @see 
+ */
+function arts_form_handler($form_name = '') {
+  // Create filenames for the form html and handler.
+  $path = drupal_get_path('module', 'arts_form') . '/forms';
+
+  $form_html = $path . '/' . $form_name . '.html';
+  $form_php  = $path . '/' . $form_name . '.inc';
+
+  // Check if the HTML and handler code for this form name exist.
+  // Return a 404 error if either is missing.
+  if (!file_exists($form_html) || !file_exists($form_php)) {
+    return drupal_not_found();
+  }
+
+  // Check if the form was submitted.
+  //
+  if (isset($_POST['form_submit_element_name'])) {
+    include_once $form_php;
+
+    // Maybe the handler should set an error condition, so we can check here and
+    // re-load the form or redirect to a success page via drupal_goto.
+  }
+  else {
+    // Return the HTML as renderable content.
+    return array(
+      '#markup' => file_get_contents($form_html)
+    );
+  }
+}
