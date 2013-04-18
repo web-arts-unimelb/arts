@@ -58,8 +58,7 @@ function _get_staff_info()
 		}
 		catch(Exception $e)
 		{
-			print_r($e);
-			die("Bad!");
+			drupal_set_message(t('Fail at ldap_conn'), 'error');
 		}
 	
 		if($ldap_bind) 
@@ -73,12 +72,11 @@ function _get_staff_info()
 				$output["uni_email"] = $info[0]["mail"][0];
 				$output["full_name"] = $info[0]["displayname"][0];
 				$output["phone"] = $info[0]["telephonenumber"][0];
-
 			}
 			catch(Exception $e)
 			{
-				print_r($e);
-				die("Bad!");
+				// Not able to find the user
+				// Die silently.
 			}
     } 
     else 
@@ -88,7 +86,7 @@ function _get_staff_info()
 	}
 	else
 	{
-		die("fail at ldap_conn");
+		drupal_set_message(t('Fail at ldap_conn'), 'error');
 	}
 	
 
