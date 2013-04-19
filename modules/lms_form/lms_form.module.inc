@@ -7,18 +7,14 @@
  */
 function lms_form_form_alter(&$form, &$form_state, $form_id)
 {
-	//dsm($form['field_lms_subject']);
-
-	if($form_id === 'lmsform_node_form')
+	// When create a new node
+	if( $form_id === 'lmsform_node_form' && empty($form['nid']['#value']) )
 	{
 		$staff_info = _get_staff_info();
 	
 		$form['field_lms_uni_email']['und'][0]['email']['#default_value'] = $staff_info['uni_email'];
 		$form['field_lms_full_name']['und'][0]['value']['#default_value'] = $staff_info['full_name'];
 		$form['field_lms_phone']['und'][0]['value']['#default_value'] = $staff_info['phone'];
-		
-		
-		
 	}
 	else
 	{
