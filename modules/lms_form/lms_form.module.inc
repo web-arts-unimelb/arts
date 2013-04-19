@@ -1,6 +1,6 @@
 <?php
 
-set_error_handler('exceptions_error_handler');
+//set_error_handler('exceptions_error_handler');
 
 /*
  * Implement hook_form_alter
@@ -104,6 +104,7 @@ function _get_staff_info()
 	return $output;
 }
 
+/*
 function exceptions_error_handler($severity, $message, $filename, $lineno) 
 {
 	if(error_reporting() == 0) 
@@ -115,3 +116,4 @@ function exceptions_error_handler($severity, $message, $filename, $lineno)
   	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 	}
 }
+*/
