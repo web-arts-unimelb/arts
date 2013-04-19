@@ -19,11 +19,11 @@ function lms_form_default_rules_configuration() {
       ],
       "DO" : [
         { "mimemail" : {
-            "to" : "gliang@unimelb.edu.au,[node:field_lms_uni_email]",
+            "to" : "gliang@unimelb.edu.au,[node:field-lms-uni-email]",
             "from_name" : "Mitch",
             "from_mail" : "mitch.buzza@unimelb.edu.au",
-            "subject" : "Your lms nomination: [node:field_lms_subject]",
-            "body" : "[node:field_lms_subject]"
+            "subject" : "Your lms nomination: [node:field-lms-subject]",
+            "body" : "[node:field-lms-subject]"
           }
         }
       ]
