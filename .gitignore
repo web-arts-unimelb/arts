@@ -6,3 +6,6 @@ settings.php
 database
 files
 private
+
+# Ignore confidential files
+misc/confidential

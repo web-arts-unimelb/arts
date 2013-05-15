@@ -15,24 +15,40 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		$form['field_lms_uni_email']['und'][0]['email']['#default_value'] = $staff_info['uni_email'];
 		$form['field_lms_full_name']['und'][0]['value']['#default_value'] = $staff_info['full_name'];
 		$form['field_lms_phone']['und'][0]['value']['#default_value'] = $staff_info['phone'];
+		
+		drupal_set_title(t(_set_lms_form_title()));
 	}
-	else
+	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
-	
+		$title = "LMS survey";
+		drupal_set_title(t($title));
+		
+		// Redirect after submission
+		$form['actions']['submit']['#submit'][] = 'lms_survey_submit_handler';
 	}
 }
 
 function _get_staff_info()
 {
+	$path = dirname(dirname(dirname(__FILE__))). "/misc/confidential/ldap.php";
+	if(!file_exists($path))
+	{
+		return;
+	}
+	else
+	{
+		include_once($path);
+	}
+
 	$output = array();
 	$output["uni_email"] = "";
 	$output["full_name"] = "";
 	$output["phone"] = "";
 
-	$ldap_username = "100us-WebLDAP";
-	$ldap_password = "Fursday...";
-	$ldap_url = "ldaps://ad1.unimelb.edu.au";
-	$ldap_port = 636;
+	$ldap_username = $arts_ldap["ad1"]["username"];
+	$ldap_password = $arts_ldap["ad1"]["password"];
+	$ldap_url = $arts_ldap["ad1"]["url"];
+	$ldap_port = $arts_ldap["ad1"]["port"];
 
 	global $user;
 	$search_cn = $user->name;
@@ -101,15 +117,130 @@ function _get_staff_info()
 }
 
 /*
-function exceptions_error_handler($severity, $message, $filename, $lineno) 
+ * hook_url_inbound_alter
+ */
+function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 {
-	if(error_reporting() == 0) 
+	if(preg_match('|^node/add/lmsform(/.*)?|', $path, $matches)) 
 	{
-    	return;
+  	global $user;
+  	if(_does_user_complete_survey($user->name))
+  	{
+ 			// Stay
+  	}
+  	else
+  	{
+  		// Go to the lms form
+  		$path = "node/add/lms-survey";
+  		drupal_goto($path);
+  	}
+  }
+}
+
+// lms
+function _does_user_complete_survey($username)
+{
+	$condi = false;
+	
+	if(_does_user_complete_survey_in_lms_db($username))
+	{
+		$condi = true;
 	}
-	if(error_reporting() & $severity) 
+	else
 	{
-  	throw new ErrorException($message, 0, $severity, $filename, $lineno);
+		if(_does_user_complete_survey_in_drupal_db($username))
+		{
+			$condi = true;
+		}
+		else
+		{
+			$condi = false;
+		}
+	}
+	
+	// Back to default db
+	db_set_active();
+	return $condi;
+}
+
+
+function _does_user_complete_survey_in_lms_db($username)
+{
+	$path = dirname(dirname(dirname(__FILE__))). "/misc/confidential/external_db.php";
+	if(file_exists($path))
+	{
+		include_once($path);
+	
+		$other_database = array(
+      'database' => $external_db['lms']['dbname'],
+      'username' => $external_db['lms']['username'],
+      'password' => $external_db['lms']['password'],
+      'host' => $external_db['lms']['host'],
+      'driver' => 'mysql',
+		);
+		// replace 'YourDatabaseKey' with something that's unique to your module
+		Database::addConnectionInfo('lms_database_key', 'default', $other_database);
+		db_set_active('lms_database_key');
+
+		$sql = "SELECT * FROM record WHERE username = '$username'";
+		$result = db_query($sql);
+
+		if($result->num_rows > 0)
+		{
+		  return true;
+		}
+		else
+		{
+		  return false;
+		}
+	}
+	else
+	{
+		return false;
 	}
 }
-*/
+
+function _does_user_complete_survey_in_drupal_db($username)
+{
+	db_set_active(); 
+	
+	$account = user_load_by_name($username);
+	if($account)
+	{
+		$sql = "SELECT * FROM {node} WHERE uid = '$account->uid' AND type = 'lms_survey'";	
+		$result = db_query($sql);
+		
+		if($result->rowCount() > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+function _set_lms_form_title()
+{
+	$curr_year_display = date("Y");
+	$curr_month = date("n");
+	
+	if($curr_month <= 6)
+	{
+		$curr_month_display = "Semester One, January - June";
+	}
+	else
+	{
+		$curr_month_display = "Semester Two, July - December";
+	}
+	
+	$return_title = "LMS Subject Nomination: $curr_month_display, $curr_year_display";
+	
+	return $return_title;
+}
+
+function lms_survey_submit_handler(&$form, &$form_state) 
+{
+  $form_state['redirect'] = 'node/add/lmsform';
+}
