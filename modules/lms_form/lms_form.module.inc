@@ -17,6 +17,9 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		$form['field_lms_phone']['und'][0]['value']['#default_value'] = $staff_info['phone'];
 		
 		drupal_set_title(t(_set_lms_form_title()));
+		
+		// Redirect after submission
+		$form['actions']['submit']['#submit'][] = 'lms_form_submit_handler';
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
@@ -243,4 +246,70 @@ function _set_lms_form_title()
 function lms_survey_submit_handler(&$form, &$form_state) 
 {
   $form_state['redirect'] = 'node/add/lmsform';
+}
+
+function lms_form_submit_handler(&$form, &$form_state)
+{
+	$msg = "";
+	unset($_SESSION['messages']);
+	drupal_set_message($msg);
+	
+	$form_state['redirect'] = _lms_confirmation_page();
+}
+
+function _lms_confirmation_page()
+{
+	global $base_root;
+	$confirmation_uri = "lms-nomination-success";
+	$confirmation_page_title = "LMS nomination";
+	
+	if(_is_node_exist($confirmation_page_title))
+	{
+		
+	}
+	else
+	{
+		_create_lms_confirmation_page($confirmation_uri, $confirmation_page_title);
+	}
+	
+	return $confirmation_uri;
+}
+
+function _create_lms_confirmation_page($confirmation_uri, $confirmation_page_title)
+{
+	//creating a bare node
+	$node = new StdClass();
+		
+	//giving it type
+	$node->type = 'page';
+	
+	//give it a published staus
+	$node->status = 1;
+	$node->language = LANGUAGE_NONE;	
+	$node->uid = 1;
+	
+	//gives title
+	$node->title = $confirmation_page_title;
+	
+	//gives body
+	$page_body = "You have sucessfully submitted a LMS nomination.";
+	$node->body[$node->language] = array(0 => array('format'=> 'full_html', 'value' => $page_body));
+  $node->path = array('alias' => $confirmation_uri);
+	
+	//save it and give it the rest of the attributes
+	node_save($node);
+}
+
+function _is_node_exist($node_title)
+{
+	$row = db_query('SELECT nid FROM {node} WHERE title = :mytitle', array(':mytitle' => $node_title))->fetchField();
+ 	
+ 	if($row) 
+ 	{
+    return true;
+ 	} 
+ 	else 
+ 	{
+    return false;
+ 	}
 }
