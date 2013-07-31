@@ -6,7 +6,7 @@ function arts_webform_form_alter(&$form, &$form_state, $form_id) {
   //dsm($form_id);  // print form ID to messages
   //dsm($form);  // pretty print array using Krumo to messages
 
-  if($form_id == 'webform_client_form_2457') {
+  if($form_id == 'webform_client_form_4885') {
     $form['#validate'][] = 'arts_webform_gsshs_booking_form_validate';
   }
 }
