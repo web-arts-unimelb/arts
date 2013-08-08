@@ -115,7 +115,6 @@ function _get_staff_info()
 		drupal_set_message(t('Fail at ldap_conn'), 'error');
 	}
 	
-
 	return $output;
 }
 
@@ -161,14 +160,17 @@ function _does_user_complete_survey($username)
 		}
 	}
 	
-	// Back to default db
-	db_set_active();
 	return $condi;
 }
 
 
 function _does_user_complete_survey_in_lms_db($username)
 {
+	// Back to default db
+  db_set_active();
+
+	$condi = false;
+
 	$path = dirname(dirname(dirname(__FILE__))). "/misc/confidential/external_db.php";
 	if(file_exists($path))
 	{
@@ -185,28 +187,31 @@ function _does_user_complete_survey_in_lms_db($username)
 		Database::addConnectionInfo('lms_database_key', 'default', $other_database);
 		db_set_active('lms_database_key');
 
-		$sql = "SELECT * FROM record WHERE username = '$username'";
+		$sql = "SELECT COUNT(*) FROM record WHERE username = '$username'";
 		$result = db_query($sql);
-
-		if($result->num_rows > 0)
+	
+		if($result->rowCount() > 0)
 		{
-		  return true;
+		  $condi = true;
 		}
 		else
 		{
-		  return false;
+		  $condi = false;
 		}
 	}
 	else
 	{
-		return false;
+		$condi = false;
 	}
+
+	// Back to default db
+  db_set_active();
+
+	return $condi;
 }
 
 function _does_user_complete_survey_in_drupal_db($username)
 {
-	db_set_active(); 
-	
 	$account = user_load_by_name($username);
 	if($account)
 	{
