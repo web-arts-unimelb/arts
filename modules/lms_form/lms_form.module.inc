@@ -20,6 +20,28 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		
 		// Redirect after submission
 		$form['actions']['submit']['#submit'][] = 'lms_form_submit_handler';
+
+		drupal_add_js('
+			jQuery(document).ready(function () {	
+				// Hide empty fieldset
+    		jQuery("input, select").change(function(){
+      		jQuery("fieldset").each(function(){
+          	var fieldset = jQuery(this);
+
+          	fieldset.show();
+
+          	var wrapper = fieldset.find(".fieldset-wrapper");
+          	if(wrapper.height() == 0){
+            	fieldset.hide();
+          	}
+          	else{
+            	fieldset.show();
+          	}
+        	});
+    		});
+			});    
+    
+  	', 'inline');
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
