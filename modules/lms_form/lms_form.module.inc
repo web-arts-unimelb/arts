@@ -21,27 +21,8 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		// Redirect after submission
 		$form['actions']['submit']['#submit'][] = 'lms_form_submit_handler';
 
-		drupal_add_js('
-			jQuery(document).ready(function () {	
-				// Hide empty fieldset
-    		jQuery("input, select").change(function(){
-      		jQuery("fieldset").each(function(){
-          	var fieldset = jQuery(this);
-
-          	fieldset.show();
-
-          	var wrapper = fieldset.find(".fieldset-wrapper");
-          	if(wrapper.height() == 0){
-            	fieldset.hide();
-          	}
-          	else{
-            	fieldset.show();
-          	}
-        	});
-    		});
-			});    
-    
-  	', 'inline');
+		// Validate
+		$form['#validate'][] = '_validate_email_domain';
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
@@ -110,10 +91,17 @@ function _get_staff_info()
 				$filter = "(cn=$search_cn)";
 				$ldap_search_res = ldap_search($ldap_conn, $ldap_dn_search, $filter); 	
 				$info = ldap_get_entries($ldap_conn, $ldap_search_res);
-
-				$output["uni_email"] = $info[0]["mail"][0];
-				$output["full_name"] = $info[0]["displayname"][0];
-				$output["phone"] = $info[0]["telephonenumber"][0];
+				
+				if(isset($info[0])) {
+					$output["uni_email"] = $info[0]["mail"][0];
+					$output["full_name"] = $info[0]["displayname"][0];
+					$output["phone"] = $info[0]["telephonenumber"][0];
+				}
+				else {
+					$output["uni_email"] = "";
+					$output["full_name"] = "";
+					$output["phone"] = "";	
+				}
 			}
 			catch(Exception $e)
 			{
@@ -159,6 +147,33 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
   		drupal_goto($path);
   	}
   }
+}
+
+
+// Validate
+function _validate_email_domain($form, &$form_state){
+
+	$pattern = "/^[a-zA-Z0-9._%+-]+@unimelb\.edu\.au$/";
+
+	// Submitter email
+	$submitter_email = $form_state['input']['field_lms_uni_email']['und'][0]['email']; 
+	if(preg_match($pattern, $submitter_email)) {
+	}
+	else {
+		form_set_error("", "University email address must be xxxx@unimelb.edu.au");	
+	}
+
+	// Staff collection fields
+	foreach($form_state['input']['field_lms_staff_collection']['und'] as $field_set) {
+		$collection_email = $field_set['field_lms_staff_email']['und']['0']['email'];
+		if(empty($collection_email)) {
+		}
+		else if(preg_match($pattern, $collection_email)) { 
+		}
+		else {
+			form_set_error("", "Staff email address must be xxxx@unimelb.edu.au");
+		}
+	}
 }
 
 // lms
@@ -319,7 +334,7 @@ function _create_lms_confirmation_page($confirmation_uri, $confirmation_page_tit
 	$node->title = $confirmation_page_title;
 	
 	//gives body
-	$page_body = "You have sucessfully submitted a LMS nomination.";
+	$page_body = "<p>You have sucessfully submitted a LMS nomination.</p><p><a href='/node/add/lmsform'>Add another lms subject.</a></p>";
 	$node->body[$node->language] = array(0 => array('format'=> 'full_html', 'value' => $page_body));
   $node->path = array('alias' => $confirmation_uri);
 	
