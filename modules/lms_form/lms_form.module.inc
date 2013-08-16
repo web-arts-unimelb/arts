@@ -23,6 +23,7 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 
 		// Validate
 		$form['#validate'][] = '_validate_email_domain';
+		$form['#validate'][] = '_validate_staff_collection';
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
@@ -152,7 +153,6 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 
 // Validate
 function _validate_email_domain($form, &$form_state){
-
 	$pattern = "/^[a-zA-Z0-9._%+-]+@unimelb\.edu\.au$/";
 
 	// Submitter email
@@ -160,7 +160,7 @@ function _validate_email_domain($form, &$form_state){
 	if(preg_match($pattern, $submitter_email)) {
 	}
 	else {
-		form_set_error("", "University email address must be xxxx@unimelb.edu.au");	
+		form_set_error("uni_email_format", "University email address must be xxxx@unimelb.edu.au");	
 	}
 
 	// Staff collection fields
@@ -171,7 +171,29 @@ function _validate_email_domain($form, &$form_state){
 		else if(preg_match($pattern, $collection_email)) { 
 		}
 		else {
-			form_set_error("", "Staff email address must be xxxx@unimelb.edu.au");
+			form_set_error("staff_email_format", "Staff email address must be xxxx@unimelb.edu.au");
+		}
+	}
+}
+
+// Validate
+function _validate_staff_collection($form, &$form_state) {
+	foreach($form_state['input']['field_lms_staff_collection']['und'] as $field_set) {
+		$staff_name = $field_set['field_lms_staff_name']['und'];	
+
+		if(empty($staff_name)) {
+		}
+		else {
+			$collection_email = $field_set['field_lms_staff_email']['und']['0']['email'];
+			if(empty($collection_email)) {
+				form_set_error("empty_staff_email", "Staff email address cannot be empty.");
+			}		
+
+			$staff_role = $field_set['field_lms_staff_role']['und'];
+			if($staff_role === "_none") {
+				form_set_error("empty_staff_role", "Staff role cannot be empty.");
+			}
+			
 		}
 	}
 }
