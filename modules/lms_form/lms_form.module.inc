@@ -24,6 +24,16 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		// Validate
 		$form['#validate'][] = '_validate_email_domain';
 		$form['#validate'][] = '_validate_staff_collection';
+
+		// Tooltip
+		drupal_add_js('
+				jQuery(document).ready(function () {
+					var msg = "Subject Coordinator (Full Access to all features);  Tutor (High level access, but cannot add/remove staff)"; 
+					jQuery("select[name*=\'field_lms_staff_role\']").attr("title", msg);
+				});	
+			'
+			, 'inline'
+		);	
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
@@ -376,4 +386,77 @@ function _is_node_exist($node_title)
  	{
     return false;
  	}
+}
+
+//hook_tokens_alter
+function lms_form_tokens_alter(array &$replacements, array $context) {
+  $options = $context['options'];
+
+  if (isset($options['language'])) {
+    $url_options['language'] = $options['language'];
+    $language_code = $options['language']->language;
+  }
+  else {
+    $language_code = NULL;
+  }
+  $sanitize = !empty($options['sanitize']);
+
+  if ($context['type'] == 'node' && !empty($context['data']['node'])) {
+    $node = $context['data']['node'];
+
+		// Cohort linked subjects label
+		if(isset($context['tokens']['field-lms-cohort-collection:0:field_lms_cohort_subject'])) {
+			$first_cohort_subject = $replacements[$context['tokens']['field-lms-cohort-collection:0:field_lms_cohort_subject']];
+			if(!empty($first_cohort_subject)) {
+				$replacements[$context['tokens']['field-lms-cohort-label']] = '<p>&nbsp;</p><p>Cohort linked subjects:</p>';
+			}
+			else {
+				$replacements[$context['tokens']['field-lms-cohort-label']] = '';
+			}
+		}
+	
+		// Subject code
+		/*		
+    if(isset($context['tokens']['field-lms-subject-code'])) {
+			$course_code = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_course_code']];
+			$study_period = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_study_period']];
+			$year = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_year']];
+
+			if(
+				!empty($course_code) && 
+				!empty($study_period) && 
+				!empty($year)
+			) {
+				// All should not be empty, otherwise all of them are empty.
+				$tmp_string = $course_code. " | ". $study_period. " | ". $year;	
+				$replacements[$context['tokens']['field-lms-subject-code']] = $tmp_string;			
+			}
+			else {
+      	$replacements[$context['tokens']['field-lms-subject-code']] = "empty: $course_code | $study_period | $year";
+			}
+    }
+		*/
+
+		// Staff detail label
+		if(isset($context['tokens']['field-lms-staff-collection:0:field_lms_staff_name'])) {
+      $first_staff_name = $replacements[$context['tokens']['field-lms-staff-collection:0:field_lms_staff_name']];
+      if(!empty($first_staff_name)) {
+        $replacements[$context['tokens']['field-lms-staff-detail-label']] = '<p>&nbsp;</p><p>Staff details:</p>';
+      }
+      else {
+        $replacements[$context['tokens']['field-lms-staff-detail-label']] = '';
+      }
+    }
+	
+		// Note label
+    if(isset($context['tokens']['field-lms-note'])) {
+      $note = $replacements[$context['tokens']['field-lms-note']];
+      if(!empty($note)) {
+        $replacements[$context['tokens']['field-lms-note-label']] = '<p>&nbsp;</p><p>Note:</p>';
+      }
+      else {
+        $replacements[$context['tokens']['field-lms-note-label']] = '';
+      }
+    }
+  }
 }
