@@ -414,28 +414,39 @@ function lms_form_tokens_alter(array &$replacements, array $context) {
 				$replacements[$context['tokens']['field-lms-cohort-label']] = '';
 			}
 		}
-	
-		// Subject code
-		/*		
-    if(isset($context['tokens']['field-lms-subject-code'])) {
-			$course_code = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_course_code']];
-			$study_period = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_study_period']];
-			$year = $replacements[$context['tokens']['field-lms-copy-sub-collection:field_lms_copy_year']];
 
-			if(
-				!empty($course_code) && 
-				!empty($study_period) && 
-				!empty($year)
-			) {
-				// All should not be empty, otherwise all of them are empty.
-				$tmp_string = $course_code. " | ". $study_period. " | ". $year;	
-				$replacements[$context['tokens']['field-lms-subject-code']] = $tmp_string;			
+
+		// Subject code
+    if(isset($node->field_lms_copy_sub_collection)) {
+			if(count($node->field_lms_copy_sub_collection) > 0) {
+				$entity_id = $node->field_lms_copy_sub_collection['und'][0][value];
+				$entity_type = 'field_collection_item';
+				$bundle = 'field_lms_copy_sub_collection';
+
+				// Course code
+				$field = 'field_lms_copy_course_code_value';
+				$table = 'field_data_field_lms_copy_course_code';
+				$course_code = _get_collection_item_value($entity_id, $entity_type, $bundle, $table, $field);
+
+				// Year
+				$field = 'field_lms_copy_year_value';
+        $table = 'field_data_field_lms_copy_year';
+        $year = _get_collection_item_value($entity_id, $entity_type, $bundle, $table, $field);
+
+				// Study period 
+        $field = 'field_lms_copy_study_period_value';
+        $table = 'field_data_field_lms_copy_study_period';
+        $study_period = _get_collection_item_value($entity_id, $entity_type, $bundle, $table, $field);
+
+				// All three components will exist.
+				$replacements[$context['tokens']['field-lms-subject-code']] = $course_code. "_". $year. "_". $study_period;  
 			}
 			else {
-      	$replacements[$context['tokens']['field-lms-subject-code']] = "empty: $course_code | $study_period | $year";
+				$entity_id = null;
+				$replacements[$context['tokens']['field-lms-subject-code']] = '';
 			}
+
     }
-		*/
 
 		// Staff detail label
 		if(isset($context['tokens']['field-lms-staff-collection:0:field_lms_staff_name'])) {
@@ -459,4 +470,22 @@ function lms_form_tokens_alter(array &$replacements, array $context) {
       }
     }
   }
+}
+
+
+function _get_collection_item_value($entity_id, $entity_type, $bundle, $table, $field) {
+	$sql = "
+ 		SELECT 
+   		n.$field
+    FROM 
+   		{$table} n 
+    WHERE 
+    	n.entity_type = :type AND
+      n.bundle = :bundle AND
+      n.entity_id = :entity_id
+  ";
+  $result = db_query($sql, array(':type' => $entity_type, ':bundle' => $bundle, ':entity_id' => $entity_id));
+  $obj = $result->fetchObject();
+
+  return $obj->$field;
 }
