@@ -312,7 +312,7 @@ function _set_lms_form_title()
 		$curr_month_display = "Semester Two, July - December";
 	}
 	
-	$return_title = "LMS Subject Nomination: $curr_month_display, $curr_year_display";
+	$return_title = "LMS Subject Nominations 2014";
 	
 	return $return_title;
 }
