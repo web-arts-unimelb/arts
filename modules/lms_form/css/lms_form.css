@@ -1,0 +1,7 @@
+html.js input.form-autocomplete {
+	width: 100%;
+}
+
+input[name='field_lms_copy_sub_collection_add_more'] {
+	display: none;
+}

@@ -30,10 +30,15 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 				jQuery(document).ready(function () {
 					var msg = "Subject Coordinator (Full Access to all features);  Tutor (High level access, but cannot add/remove staff)"; 
 					jQuery("select[name*=\'field_lms_staff_role\']").attr("title", msg);
+
+					jQuery("#edit-field-lms-copy-sub-collection-und-0-remove-button").attr("disabled", "disabled");
 				});	
 			'
 			, 'inline'
-		);	
+		);
+
+		// Add css
+		drupal_add_css(drupal_get_path('module', 'lms_form') . '/css/lms_form.css');
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
