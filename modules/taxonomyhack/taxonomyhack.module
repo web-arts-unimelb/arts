@@ -1,0 +1,7 @@
+<?php
+function taxonomyhack_menu_alter(&$items) {
+  $items['taxonomy/term/%taxonomy_term']['access arguments']
+    = $items['taxonomy/term/%taxonomy_term/edit']['access arguments']
+    = $items['taxonomy/term/%taxonomy_term/feed']['access arguments']
+    = array('administer taxonomy');
+}
