@@ -1,5 +1,5 @@
 name = Taxonomy Hack
-description = Disable taxonomy paths.
+description = Disable taxonomy term pages for all vocabularies.
 core = 7.x
-package = Faculty of Arts
+package = University of Melbourne
 dependencies[] = taxonomy

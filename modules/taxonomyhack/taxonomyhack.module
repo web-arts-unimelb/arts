@@ -1,7 +1,14 @@
 <?php
 function taxonomyhack_menu_alter(&$items) {
-  $items['taxonomy/term/%taxonomy_term']['access arguments']
-    = $items['taxonomy/term/%taxonomy_term/edit']['access arguments']
-    = $items['taxonomy/term/%taxonomy_term/feed']['access arguments']
-    = array('administer taxonomy');
+  $items['taxonomy/term/%taxonomy_term']['page callback']
+    = $items['taxonomy/term/%taxonomy_term/edit']['page callback']
+    = $items['taxonomy/term/%taxonomy_term/feed']['page callback']
+    = 'taxonomyhack_term_list_disabled';
+}
+
+/**
+ * Callback that hates the world.
+ */
+function taxonomyhack_term_list_disabled() {
+  return MENU_NOT_FOUND;
 }
