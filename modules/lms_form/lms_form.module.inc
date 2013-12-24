@@ -217,26 +217,39 @@ function _validate_staff_collection($form, &$form_state) {
 function _does_user_complete_survey($username)
 {
 	$condi = false;
-	
+
+	if(_does_user_complete_survey_is_admin($username))
+ 	{	
+		 $condi = true;
+	}	
 	if(_does_user_complete_survey_in_lms_db($username))
 	{
 		$condi = true;
 	}
-	else
+	elseif(_does_user_complete_survey_in_drupal_db($username))
 	{
-		if(_does_user_complete_survey_in_drupal_db($username))
-		{
-			$condi = true;
-		}
-		else
-		{
-			$condi = false;
-		}
+		$condi = true;
 	}
 	
 	return $condi;
 }
 
+function _does_user_complete_survey_is_admin($username)
+{
+	$username_array = array(
+		'test-site-admin',
+		'gliang',
+		'mmhinze',
+		'mbuzza'
+	);
+
+	if(in_array($username, $username_array)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 function _does_user_complete_survey_in_lms_db($username)
 {
