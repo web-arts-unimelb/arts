@@ -149,16 +149,34 @@ function _get_staff_info()
  */
 function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 {
-	if(preg_match('|^node/add/lmsform(/.*)?|', $path, $matches)) 
-	{
-  	global $user;
+	global $user;	
+
+	if(preg_match('|^node/add/lms-survey(/.*)?|', $path, $matches)) {
+		if(_does_user_complete_survey_is_admin($user->name)) {
+			// Stay in the survey
+		}
+		else if(_does_user_complete_survey($user->name))
+    {
+			// Go to the lms form
+      $path = "node/add/lmsform";
+      drupal_goto($path);      
+    }
+    else
+    {
+			// Stay in the survey
+    }
+	}
+	else if(preg_match('|^node/add/lmsform(/.*)?|', $path, $matches)) {
+		if(_does_user_complete_survey_is_admin($user->name)) {
+      // Stay in the lms_form 
+    }
   	if(_does_user_complete_survey($user->name))
   	{
- 			// Stay
+ 			// Stay in lmsform
   	}
   	else
   	{
-  		// Go to the lms form
+  		// Go to the survey 
   		$path = "node/add/lms-survey";
   		drupal_goto($path);
   	}
@@ -218,15 +236,7 @@ function _does_user_complete_survey($username)
 {
 	$condi = false;
 
-	if(_does_user_complete_survey_is_admin($username))
- 	{	
-		 $condi = true;
-	}	
-	if(_does_user_complete_survey_in_lms_db($username))
-	{
-		$condi = true;
-	}
-	elseif(_does_user_complete_survey_in_drupal_db($username))
+	if(_does_user_complete_survey_in_drupal_db($username))
 	{
 		$condi = true;
 	}
@@ -251,6 +261,7 @@ function _does_user_complete_survey_is_admin($username)
 	}
 }
 
+/*
 function _does_user_complete_survey_in_lms_db($username)
 {
 	// Back to default db
@@ -296,6 +307,7 @@ function _does_user_complete_survey_in_lms_db($username)
 
 	return $condi;
 }
+*/
 
 function _does_user_complete_survey_in_drupal_db($username)
 {
