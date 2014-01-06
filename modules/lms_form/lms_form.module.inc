@@ -54,6 +54,9 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		
 		// Redirect after submission
 		$form['actions']['submit']['#submit'][] = 'lms_survey_submit_handler';
+
+		// Add css
+    drupal_add_css(drupal_get_path('module', 'lms_form') . '/css/lms_form.css');
 	}
 }
 
