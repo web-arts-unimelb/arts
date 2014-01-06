@@ -42,8 +42,15 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
-		$title = "LMS survey";
+		$title = "Survey";
 		drupal_set_title(t($title));
+	
+		// Remove N/A
+		unset($form['field_survey_turnitin'][LANGUAGE_NONE]['#options']['_none']);		
+		unset($form['field_survey_online_feedback'][LANGUAGE_NONE]['#options']['_none']);
+		unset($form['field_survey_more_turnitin'][LANGUAGE_NONE]['#options']['_none']);
+		unset($form['field_survey_tracking'][LANGUAGE_NONE]['#options']['_none']);
+		unset($form['field_survey_collect_data'][LANGUAGE_NONE]['#options']['_none']);
 		
 		// Redirect after submission
 		$form['actions']['submit']['#submit'][] = 'lms_survey_submit_handler';
