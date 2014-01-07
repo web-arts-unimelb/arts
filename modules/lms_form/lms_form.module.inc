@@ -42,7 +42,7 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 	}
 	elseif($form_id === 'lms_survey_node_form' && empty($form['nid']['#value']))
 	{
-		$title = "Survey";
+		$title = "eTeaching survey";
 		drupal_set_title(t($title));
 	
 		// Remove N/A
