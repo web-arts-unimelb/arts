@@ -258,9 +258,9 @@ function _does_user_complete_survey_is_admin($username)
 {
 	$username_array = array(
 		'test-site-admin',
-		'gliang',
+		//'gliang',
 		'mmhinze',
-		'mbuzza'
+		//'mbuzza'
 	);
 
 	if(in_array($username, $username_array)) {
