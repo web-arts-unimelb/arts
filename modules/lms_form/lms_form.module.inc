@@ -167,9 +167,12 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 		}
 		else if(_does_user_complete_survey($user->name))
     {
-			// Go to the lms form
-      $path = "node/add/lmsform";
-      drupal_goto($path);      
+			// https://drupal.org/node/1140842
+			if(!drupal_is_cli()) {
+				// Go to the lms form
+      	$path = "node/add/lmsform";
+      	drupal_goto($path);
+			}   
     }
     else
     {
@@ -186,9 +189,12 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
   	}
   	else
   	{
-  		// Go to the survey 
-  		$path = "node/add/lms-survey";
-  		drupal_goto($path);
+			// https://drupal.org/node/1140842
+			if(!drupal_is_cli()) {
+  			// Go to the survey 
+  			$path = "node/add/lms-survey";
+  			drupal_goto($path);
+			}
   	}
   }
 }
