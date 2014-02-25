@@ -168,7 +168,10 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 		else if(_does_user_complete_survey($user->name))
     {
 			// https://drupal.org/node/1140842
-			if(!drupal_is_cli()) {
+			if(
+					!drupal_is_cli() || 
+					!preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches)
+			) {
 				// Go to the lms form
       	$path = "node/add/lmsform";
       	drupal_goto($path);
@@ -190,7 +193,10 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
   	else
   	{
 			// https://drupal.org/node/1140842
-			if(!drupal_is_cli()) {
+			if(
+          !drupal_is_cli() || 
+          !preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches)
+      ) {	
   			// Go to the survey 
   			$path = "node/add/lms-survey";
   			drupal_goto($path);
