@@ -167,10 +167,18 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 		}
 		else if(_does_user_complete_survey($user->name))
     {
-			// https://drupal.org/node/1140842
+			/*
+				Run drush cron, if the still go to node/add/lmsform
+				Extra: 
+				https://drupal.org/node/1140842
+				https://drupal.org/node/1217668
+				http://drupal.stackexchange.com/questions/89977/how-to-programmatically-determine-if-the-cron-is-running
+			*/
+
 			if(
 					!drupal_is_cli() || 
-					!preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches)
+					!preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches) ||
+					variable_get('cron_semaphore', FALSE) // cron is running
 			) {
 				// Go to the lms form
       	$path = "node/add/lmsform";
@@ -192,10 +200,17 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
   	}
   	else
   	{
-			// https://drupal.org/node/1140842
+			/*
+				Run drush cron, if the still go to node/add/lmsform
+        Extra: 
+        https://drupal.org/node/1140842
+        https://drupal.org/node/1217668
+        http://drupal.stackexchange.com/questions/89977/how-to-programmatically-determine-if-the-cron-is-running
+			*/
 			if(
           !drupal_is_cli() || 
-          !preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches)
+          !preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches) ||
+					variable_get('cron_semaphore', FALSE) // cron is running
       ) {	
   			// Go to the survey 
   			$path = "node/add/lms-survey";
