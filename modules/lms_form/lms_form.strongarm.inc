@@ -42,7 +42,7 @@ function lms_form_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'ant_pattern_lmsform';
-  $strongarm->value = '[node:field-lms-subject]';
+  $strongarm->value = '[node:field-lms-primary-subject]';
   $export['ant_pattern_lmsform'] = $strongarm;
 
   $strongarm = new stdClass();
