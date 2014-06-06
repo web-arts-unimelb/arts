@@ -24,6 +24,7 @@ function lms_form_form_alter(&$form, &$form_state, $form_id)
 		// Validate
 		$form['#validate'][] = '_validate_email_domain';
 		$form['#validate'][] = '_validate_staff_collection';
+		$form['#validate'][] = '_validate_course_code';
 
 		// Tooltip
 		drupal_add_js('
@@ -263,8 +264,25 @@ function _validate_staff_collection($form, &$form_state) {
 			if($staff_role === "_none") {
 				form_set_error("empty_staff_role", "Staff role cannot be empty.");
 			}
-			
 		}
+	}
+}
+
+// Validate
+function _validate_course_code($form, &$form_state) {
+	foreach($form_state['input']['field_lms_copy_sub_collection']['und'] as $field_set) {
+		$course_code = $field_set['field_lms_copy_course_code']['und']['0']['value'];	
+		$pattern = "/^[A-Z]{4}[0-9]{5}$/";
+		
+		if(preg_match($pattern, $course_code)) {
+	
+  	}
+		elseif(empty($course_code)) {
+			// it cannot be empty, but ...
+		}
+  	else {
+    	form_set_error("course_code_format", "Course code needs to be 4 capital letters followed by 5 numbers. e.g. HIST12345");
+  	}	
 	}
 }
 
@@ -482,11 +500,30 @@ function lms_form_tokens_alter(array &$replacements, array $context) {
 			}
 		}
 
+		//test
+		/*
+		$msg = "<pre> start --- ". print_r($replacements, TRUE). "</pre>";
+		watchdog('lms', $msg);	
+
+		$msg = "<pre>". print_r($context, TRUE). "</pre>";
+    watchdog('lms', $msg);
+		*/
+
+		// Is copy forward verify radio button clicked? 
+		if(isset($node->field_lms_copy_verify)) {
+      $is_verify = $node->field_lms_copy_verify['und'][0]['value'];
+      if(!empty($is_verify)) {
+        $replacements[$context['tokens']['field-lms-copy-forward-verify']] = '<p>&nbsp;</p><p>I verify this subject has content to copy forward: '. $is_verify. '</p>';
+      }
+      else {
+        $replacements[$context['tokens']['field-lms-copy-forward-verify']] = '';
+      }
+    }
 
 		// Subject code
     if(isset($node->field_lms_copy_sub_collection)) {
 			if(count($node->field_lms_copy_sub_collection) > 0) {
-				$entity_id = $node->field_lms_copy_sub_collection['und'][0][value];
+				$entity_id = $node->field_lms_copy_sub_collection['und'][0]['value'];
 				$entity_type = 'field_collection_item';
 				$bundle = 'field_lms_copy_sub_collection';
 
