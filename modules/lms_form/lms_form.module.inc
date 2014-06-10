@@ -420,7 +420,7 @@ function _lms_confirmation_page()
 {
 	global $base_root;
 	$confirmation_uri = "lms-nomination-success";
-	$confirmation_page_title = "LMS nomination";
+	$confirmation_page_title = "LMS nomination success";
 	
 	if(_is_node_exist($confirmation_page_title))
 	{
@@ -513,7 +513,7 @@ function lms_form_tokens_alter(array &$replacements, array $context) {
 		if(isset($node->field_lms_copy_verify)) {
       $is_verify = $node->field_lms_copy_verify['und'][0]['value'];
       if(!empty($is_verify)) {
-        $replacements[$context['tokens']['field-lms-copy-forward-verify']] = '<p>&nbsp;</p><p>I verify this subject has content to copy forward: '. $is_verify. '</p>';
+        $replacements[$context['tokens']['field-lms-copy-forward-verify']] = '<p>&nbsp;</p><p>All subject codes subject names, years and study periods are correct: '. $is_verify. '</p>';
       }
       else {
         $replacements[$context['tokens']['field-lms-copy-forward-verify']] = '';
