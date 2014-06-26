@@ -162,6 +162,7 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 {
 	global $user;	
 
+	// It seems when batch is running, all urls will be scanned.
 	if(preg_match('|^node/add/lms-survey(/.*)?|', $path, $matches)) {
 		if(_does_user_complete_survey_is_admin($user->name)) {
 			// Stay in the survey
@@ -179,11 +180,17 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
 			if(
 					!drupal_is_cli() || 
 					!preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches) ||
-					variable_get('cron_semaphore', FALSE) // cron is running
+					variable_get('cron_semaphore', FALSE) // cron is running 
 			) {
+				/*
+				//test
+				$msg = '<pre>'. print_r($path, TRUE). print_r($user, TRUE). '</pre>';
+				watchdog('lms_form 1', $msg);
+				*/
+
 				// Go to the lms form
-      	$path = "node/add/lmsform";
-      	drupal_goto($path);
+      	$the_path = "node/add/lmsform";
+      	drupal_goto($the_path);
 			}   
     }
     else
@@ -212,10 +219,16 @@ function lms_form_url_inbound_alter(&$path, $original_path, $path_language)
           !drupal_is_cli() || 
           !preg_match('|^admin/reports/status/run-cron(/.*)?|', $path, $matches) ||
 					variable_get('cron_semaphore', FALSE) // cron is running
-      ) {	
+      ) {
+				/*
+				//test
+        $msg = '<pre>'. print_r($path, TRUE). print_r($user, TRUE). '</pre>';
+        watchdog('lms_form 2', $msg);
+				*/	
+
   			// Go to the survey 
-  			$path = "node/add/lms-survey";
-  			drupal_goto($path);
+  			$the_path = "node/add/lms-survey";
+  			drupal_goto($the_path);
 			}
   	}
   }
