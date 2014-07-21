@@ -464,7 +464,11 @@ function _create_lms_confirmation_page($confirmation_uri, $confirmation_page_tit
 	$node->title = $confirmation_page_title;
 	
 	//gives body
-	$page_body = "<p>You have sucessfully submitted a LMS nomination.</p><p><a href='/node/add/lmsform'>Add another lms subject.</a></p>";
+	$page_body = "
+		<p>You have sucessfully submitted a LMS nomination.</p>
+		<p>Thanks for your formal nomination of your LMS subject site. Your request will be checked and forwarded to the central LMS team who will create the site. The enrolled students will then be fed in from ISIS and the staff members will be added. You can then begin customising and updating your site, before making it available to the students.</p>
+		<p><a href='/node/add/lmsform'>Add another lms subject.</a></p>
+	";
 	$node->body[$node->language] = array(0 => array('format'=> 'full_html', 'value' => $page_body));
   $node->path = array('alias' => $confirmation_uri);
 	
